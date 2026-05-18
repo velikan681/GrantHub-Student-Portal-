@@ -1,0 +1,21 @@
+{% extends 'portal/base.html' %}
+{% block title %}Категории{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="content-panel">
+        <span class="section-kicker">Направления</span>
+        <h1>Добавить направление</h1>
+        <form method="post" class="vstack gap-3">{% csrf_token %}{{ form.name }}<button class="btn btn-primary">Добавить</button></form>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="content-panel">
+        <h2>Список направлений</h2>
+        <div class="tag-cloud mt-3">{% for category in categories %}<span>{{ category.name }}</span>{% endfor %}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

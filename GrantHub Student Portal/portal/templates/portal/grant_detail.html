@@ -1,0 +1,49 @@
+{% extends 'portal/base.html' %}
+{% block title %}{{ grant.title }}{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="detail-header">
+    <div>
+      <span class="type-pill">{{ grant.get_opportunity_type_display }}</span>
+      <h1>{{ grant.title }}</h1>
+      <p><i class="bi bi-building"></i> {{ grant.organization }} · <i class="bi bi-geo-alt"></i> {{ grant.country }} · {{ grant.category.name }}</p>
+    </div>
+    <div class="actions">
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'save_grant' grant.pk %}">{% csrf_token %}<button class="btn btn-outline-primary" {% if saved %}disabled{% endif %}><i class="bi bi-bookmark"></i> {% if saved %}Сохранено{% else %}Сохранить{% endif %}</button></form>
+        <a class="btn btn-primary {% if applied %}disabled{% endif %}" href="{% url 'apply_grant' grant.pk %}"><i class="bi bi-send"></i> {% if applied %}Заявка подана{% else %}Подать заявку{% endif %}</a>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'login' %}">Войти для подачи заявки</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-lg-8">
+      <div class="content-panel article-panel">
+        <h2><i class="bi bi-info-circle"></i> Описание программы</h2>
+        <p>{{ grant.description }}</p>
+        <h2><i class="bi bi-check2-square"></i> Требования</h2>
+        <p>{{ grant.requirements|linebreaks }}</p>
+        <h2><i class="bi bi-folder2-open"></i> Необходимые документы</h2>
+        <p>{{ grant.documents|linebreaks }}</p>
+      </div>
+    </div>
+    <aside class="col-lg-4">
+      <div class="side-panel sticky-side">
+        <div class="deadline-box {% if grant.is_deadline_soon %}urgent{% endif %}">
+          <span>Дедлайн</span>
+          <strong>{{ grant.deadline|date:"d.m.Y" }}</strong>
+        </div>
+        <dl>
+          <dt>Уровень образования</dt><dd>{{ grant.education_level }}</dd>
+          <dt>Направление</dt><dd>{{ grant.category.name }}</dd>
+          <dt>Организатор</dt><dd>{{ grant.organization }}</dd>
+          <dt>Официальный сайт</dt><dd><a href="{{ grant.official_link }}" target="_blank" rel="noreferrer">Перейти на сайт <i class="bi bi-box-arrow-up-right"></i></a></dd>
+          <dt>Добавлено</dt><dd>{{ grant.created_at|date:"d.m.Y H:i" }}</dd>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

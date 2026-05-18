@@ -1,0 +1,19 @@
+{% extends 'portal/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="content-panel wide-form">
+    <span class="section-kicker">Управление программой</span>
+    <h1>{{ title }}</h1>
+    {% include 'portal/form_errors.html' %}
+    <form method="post" class="row g-3">{% csrf_token %}
+      {% for field in form %}
+        <div class="col-md-{% if field.name == 'description' or field.name == 'requirements' or field.name == 'documents' %}12{% else %}6{% endif %}">
+          <label class="form-label">{{ field.label }}</label>{{ field }}<div class="field-error">{{ field.errors }}</div>
+        </div>
+      {% endfor %}
+      <div class="col-12"><button class="btn btn-primary btn-lg">Сохранить</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

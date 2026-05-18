@@ -1,0 +1,60 @@
+{% extends 'portal/base.html' %}
+{% block title %}Управление заявками{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="catalog-hero">
+    <span class="section-kicker">Администрирование</span>
+    <h1>Управление заявками</h1>
+    <p>Просмотр заявок студентов, фильтрация и изменение статусов. Для отчетности можно скачать Excel-файл.</p>
+    <div class="mt-3 d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{% url 'export_excel' %}"><i class="bi bi-file-earmark-excel"></i> Скачать Excel</a>
+      <a class="btn btn-outline-primary" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+  </div>
+
+  <div class="content-panel mb-4">
+    <form method="get" class="management-filter">
+      <select class="form-select" name="status">
+        <option value="">Все статусы</option>
+        {% for value,label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <select class="form-select" name="grant">
+        <option value="">Все гранты</option>
+        {% for grant in all_grants %}<option value="{{ grant.id }}" {% if selected_grant == grant.id|stringformat:'s' %}selected{% endif %}>{{ grant.title }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-primary"><i class="bi bi-funnel"></i> Фильтр</button>
+      <a class="btn btn-outline-primary" href="{% url 'manage_applications' %}">Сбросить</a>
+    </form>
+  </div>
+
+  <div class="table-responsive content-panel">
+    <table class="table table-hover align-middle admin-table">
+      <thead><tr><th>Студент</th><th>Грант</th><th>Организация</th><th>Документы</th><th>Статус</th><th></th></tr></thead>
+      <tbody>
+        {% for app in applications %}
+          <tr>
+            <td>{{ app.user.full_name }}<br><small>{{ app.user.email }} · {{ app.user.university }}</small></td>
+            <td>{{ app.grant.title }}<br><small>{{ app.submitted_at|date:"d.m.Y H:i" }}</small></td>
+            <td>{{ app.grant.organization }}<br><small>{{ app.grant.country }}</small></td>
+            <td class="small">
+              {% if app.cv_file %}<a href="{{ app.cv_file.url }}">CV</a>{% endif %}
+              {% if app.motivation_letter %}<a href="{{ app.motivation_letter.url }}">Письмо</a>{% endif %}
+              {% if app.certificate_file %}<a href="{{ app.certificate_file.url }}">Сертификаты</a>{% endif %}
+              {% if not app.cv_file and not app.motivation_letter and not app.certificate_file %}<span class="text-secondary">нет файлов</span>{% endif %}
+            </td>
+            <td><span class="status">{{ app.get_status_display }}</span></td>
+            <td>
+              <form method="post" action="{% url 'update_application_status' app.pk %}" class="d-flex gap-2">{% csrf_token %}
+                <select name="status" class="form-select form-select-sm">
+                  {% for value,label in app.Status.choices %}<option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                <button class="btn btn-sm btn-primary">OK</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}<tr><td colspan="6" class="text-secondary">Заявок пока нет.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

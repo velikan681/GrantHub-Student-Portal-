@@ -1,0 +1,124 @@
+{% extends 'portal/base.html' %}
+{% block title %}GrantHub Student Portal{% endblock %}
+{% block content %}
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="eyebrow"><i class="bi bi-stars"></i> Образовательные возможности в одном месте</span>
+        <h1>Найди грант для своего образования</h1>
+        <p class="lead">Портал помогает студентам вузов находить гранты, стипендии, конкурсы и образовательные программы.</p>
+        <div class="hero-actions">
+          <a href="{% url 'grants_list' %}" class="btn btn-primary btn-lg"><i class="bi bi-search"></i> Найти грант</a>
+          <a href="{% url 'register' %}" class="btn btn-white btn-lg">Зарегистрироваться</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-illustration" aria-label="Иллюстрация образовательного портала">
+          <div class="student-card">
+            <div class="avatar"><i class="bi bi-person-workspace"></i></div>
+            <div><strong>Студент</strong><span>подбор грантов</span></div>
+          </div>
+          <div class="laptop">
+            <div class="screen">
+              <span></span><span></span><span></span>
+              <div class="screen-card">AI Scholarship</div>
+              <div class="screen-card small">Deadline: 12 дней</div>
+            </div>
+            <div class="keyboard"></div>
+          </div>
+          <div class="floating-icon icon-a"><i class="bi bi-file-earmark-text"></i></div>
+          <div class="floating-icon icon-b"><i class="bi bi-globe2"></i></div>
+          <div class="floating-icon icon-c"><i class="bi bi-award"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container search-shell">
+  <form class="home-search" method="get" action="{% url 'grants_list' %}">
+    <div class="search-field wide"><i class="bi bi-search"></i><input name="q" placeholder="Поиск по названию гранта"></div>
+    <div class="search-field"><i class="bi bi-geo-alt"></i><input name="country" placeholder="Страна"></div>
+    <select class="form-select" name="category">
+      <option value="">Направление</option>
+      {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+    </select>
+    <input class="form-control" name="education_level" placeholder="Уровень образования">
+    <input class="form-control" type="date" name="deadline">
+    <button class="btn btn-primary"><i class="bi bi-search"></i> Поиск</button>
+  </form>
+</section>
+
+<section class="container section-space">
+  <div class="section-head">
+    <div>
+      <span class="section-kicker">Подборка</span>
+      <h2>Актуальные гранты</h2>
+    </div>
+    <a href="{% url 'grants_list' %}">Смотреть все</a>
+  </div>
+  <div class="row g-4">
+    {% for grant in actual_grants %}
+      <div class="col-md-6 col-xl-4">{% include 'portal/grant_card.html' %}</div>
+    {% empty %}
+      <p class="text-secondary">Пока нет опубликованных возможностей.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="deadline-band section-space">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-7">
+        <div class="section-head">
+          <div>
+            <span class="section-kicker">Важно</span>
+            <h2>Скоро дедлайн</h2>
+          </div>
+        </div>
+        <div class="deadline-list">
+          {% for grant in soon_grants %}
+            <a class="deadline-row" href="{% url 'grant_detail' grant.pk %}">
+              <span>{{ grant.title }}</span>
+              <strong><i class="bi bi-exclamation-circle"></i> {{ grant.deadline|date:"d.m.Y" }}</strong>
+            </a>
+          {% empty %}
+            <div class="deadline-row muted">Ближайших дедлайнов нет.</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="popular-card">
+          <span class="section-kicker">Темы</span>
+          <h2>Популярные направления</h2>
+          <div class="tag-cloud mt-3">
+            <a href="{% url 'grants_list' %}?q=IT"><i class="bi bi-cpu"></i> IT</a>
+            <a href="{% url 'grants_list' %}?q=медицина"><i class="bi bi-heart-pulse"></i> Медицина</a>
+            <a href="{% url 'grants_list' %}?q=инженерия"><i class="bi bi-gear"></i> Инженерия</a>
+            <a href="{% url 'grants_list' %}?q=экономика"><i class="bi bi-graph-up"></i> Экономика</a>
+            <a href="{% url 'grants_list' %}?q=педагогика"><i class="bi bi-book"></i> Педагогика</a>
+            <a href="{% url 'grants_list' %}?q=языки"><i class="bi bi-translate"></i> Иностранные языки</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container section-space">
+  <div class="section-head">
+    <div>
+      <span class="section-kicker">Почему удобно</span>
+      <h2>Преимущества портала</h2>
+    </div>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-card"><i class="bi bi-lightning-charge"></i><h3>Быстрый поиск</h3><p>Фильтры помогают найти подходящую программу за несколько кликов.</p></div>
+    <div class="feature-card"><i class="bi bi-person-badge"></i><h3>Личный кабинет</h3><p>Профиль, заявки, сохраненные гранты и история действий в одном месте.</p></div>
+    <div class="feature-card"><i class="bi bi-magic"></i><h3>Рекомендации</h3><p>Система подбирает программы по уровню образования и интересам.</p></div>
+    <div class="feature-card"><i class="bi bi-bell"></i><h3>Уведомления</h3><p>Напоминания о дедлайнах и изменениях статуса заявки.</p></div>
+    <div class="feature-card"><i class="bi bi-send-check"></i><h3>Онлайн-заявки</h3><p>Студент может отправить документы прямо через портал.</p></div>
+  </div>
+</section>
+{% endblock %}

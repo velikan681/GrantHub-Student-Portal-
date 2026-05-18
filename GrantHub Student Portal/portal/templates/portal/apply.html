@@ -1,0 +1,16 @@
+{% extends 'portal/base.html' %}
+{% block title %}Подача заявки{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="content-panel narrow">
+    <span class="section-kicker">Онлайн-заявка</span>
+    <h1>Подача заявки</h1>
+    <p class="text-secondary">{{ grant.title }}</p>
+    {% include 'portal/form_errors.html' %}
+    <form method="post" enctype="multipart/form-data" class="vstack gap-3">{% csrf_token %}
+      {% for field in form %}<label>{{ field.label }}{{ field }}</label>{% endfor %}
+      <button class="btn btn-primary btn-lg">Отправить заявку</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

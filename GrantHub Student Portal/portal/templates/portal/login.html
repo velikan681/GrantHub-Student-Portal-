@@ -1,0 +1,18 @@
+{% extends 'portal/base.html' %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <span class="section-kicker">Авторизация</span>
+    <h1>Вход в личный кабинет</h1>
+    {% include 'portal/form_errors.html' %}
+    <form method="post" class="vstack gap-3">{% csrf_token %}
+      {% for field in form %}
+        <label>{{ field.label }}{{ field }}</label>
+      {% endfor %}
+      <button class="btn btn-primary btn-lg">Войти</button>
+      <a href="{% url 'password_reset' %}">Восстановить пароль</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+<article class="grant-card h-100">
+  <div class="grant-card-top">
+    <span class="type-pill">{{ grant.get_opportunity_type_display }}</span>
+    <span class="deadline-pill {% if grant.is_deadline_soon %}urgent{% endif %}">
+      <i class="bi bi-clock"></i> {{ grant.deadline|date:"d.m.Y" }}
+    </span>
+  </div>
+  <h3><a href="{% url 'grant_detail' grant.pk %}">{{ grant.title }}</a></h3>
+  <p class="line-clamp">{{ grant.description }}</p>
+  <div class="grant-meta">
+    <span><i class="bi bi-geo-alt"></i> {{ grant.country }}</span>
+    <span><i class="bi bi-diagram-3"></i> {{ grant.category.name }}</span>
+    <span><i class="bi bi-mortarboard"></i> {{ grant.education_level }}</span>
+  </div>
+  <div class="grant-card-actions">
+    <a href="{% url 'grant_detail' grant.pk %}" class="btn btn-primary btn-sm">Подробнее</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'save_grant' grant.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn btn-outline-primary btn-sm" aria-label="Сохранить"><i class="bi bi-bookmark"></i> Сохранить</button>
+      </form>
+    {% else %}
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}"><i class="bi bi-bookmark"></i> Сохранить</a>
+    {% endif %}
+  </div>
+</article>

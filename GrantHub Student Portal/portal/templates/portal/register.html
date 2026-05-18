@@ -1,0 +1,17 @@
+{% extends 'portal/base.html' %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <span class="section-kicker">Новый аккаунт</span>
+    <h1>Регистрация студента</h1>
+    {% include 'portal/form_errors.html' %}
+    <form method="post" class="vstack gap-3">{% csrf_token %}
+      {% for field in form %}
+        <label>{{ field.label }}{{ field }}<span class="field-error">{{ field.errors }}</span></label>
+      {% endfor %}
+      <button class="btn btn-primary btn-lg">Создать аккаунт</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

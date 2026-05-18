@@ -1,0 +1,63 @@
+{% extends 'portal/base.html' %}
+{% block title %}Каталог грантов{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="catalog-hero">
+    <div>
+      <span class="section-kicker">Каталог</span>
+      <h1>Гранты, стипендии и стажировки</h1>
+      <p>Фильтруйте возможности по стране, направлению, уровню образования, дедлайну и типу программы.</p>
+    </div>
+  </div>
+
+  <form method="get" class="catalog-layout">
+    <aside class="filter-sidebar">
+      <h2><i class="bi bi-sliders"></i> Фильтры</h2>
+      <label>Страна
+        <select class="form-select" name="country">
+          <option value="">Все страны</option>
+          {% for country in countries %}<option value="{{ country }}" {% if request.GET.country == country %}selected{% endif %}>{{ country }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Направление
+        <select class="form-select" name="category">
+          <option value="">Все направления</option>
+          {% for category in categories %}<option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Уровень образования
+        <input class="form-control" name="education_level" value="{{ request.GET.education_level }}" placeholder="Бакалавриат">
+      </label>
+      <label>Дедлайн до
+        <input class="form-control" type="date" name="deadline" value="{{ request.GET.deadline }}">
+      </label>
+      <label>Тип возможности
+        <select class="form-select" name="opportunity_type">
+          <option value="">Все типы</option>
+          {% for value,label in types %}<option value="{{ value }}" {% if request.GET.opportunity_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <button class="btn btn-primary w-100"><i class="bi bi-search"></i> Поиск</button>
+    </aside>
+
+    <section class="catalog-results">
+      <div class="catalog-toolbar">
+        <div class="search-field flex-grow-1"><i class="bi bi-search"></i><input name="q" value="{{ request.GET.q }}" placeholder="Поиск по названию, стране, организатору"></div>
+        <select class="form-select sort-select" name="sort">
+          <option value="deadline" {% if request.GET.sort == 'deadline' or not request.GET.sort %}selected{% endif %}>По дедлайну</option>
+          <option value="country" {% if request.GET.sort == 'country' %}selected{% endif %}>По стране</option>
+          <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>По популярности</option>
+          <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Новые</option>
+        </select>
+      </div>
+      <div class="row g-4">
+        {% for grant in grants %}
+          <div class="col-md-6 col-xl-4">{% include 'portal/grant_card.html' %}</div>
+        {% empty %}
+          <div class="col-12"><div class="empty-state">По выбранным параметрам ничего не найдено.</div></div>
+        {% endfor %}
+      </div>
+    </section>
+  </form>
+</div>
+{% endblock %}

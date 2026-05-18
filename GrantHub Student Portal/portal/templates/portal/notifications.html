@@ -1,0 +1,14 @@
+{% extends 'portal/base.html' %}
+{% block title %}Уведомления{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="catalog-hero">
+    <span class="section-kicker">Центр уведомлений</span>
+    <h1>Уведомления</h1>
+    <p>Дедлайны, новые рекомендации и изменения статуса заявок.</p>
+  </div>
+  <div class="content-panel">
+    {% for note in notifications %}<div class="notification-row"><span>{{ note.message }}</span><small>{{ note.created_at|date:"d.m.Y H:i" }}</small></div>{% empty %}<p class="text-secondary">Уведомлений нет.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

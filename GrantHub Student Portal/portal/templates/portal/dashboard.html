@@ -1,0 +1,123 @@
+{% extends 'portal/base.html' %}
+{% block title %}Панель управления{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="admin-hero">
+    <div>
+      <span class="section-kicker">Dashboard</span>
+      <h1>{% if user.role == 'organization' and not user.is_staff %}Панель организации{% else %}Панель администрации{% endif %}</h1>
+      <p>Подробная аналитика, управление грантами, заявками, статусами и выгрузка данных в Excel.</p>
+    </div>
+    <div class="admin-actions">
+      <a class="btn btn-primary" href="{% url 'grant_create' %}"><i class="bi bi-plus-circle"></i> Добавить грант</a>
+      <a class="btn btn-outline-primary" href="{% url 'export_excel' %}"><i class="bi bi-file-earmark-excel"></i> Скачать Excel</a>
+    </div>
+  </div>
+
+  <div class="stats-grid management-stats">
+    <div class="stat-card"><i class="bi bi-people"></i><strong>{{ users_count }}</strong><span>{% if user.role == 'organization' and not user.is_staff %}студентов в заявках{% else %}пользователей{% endif %}</span></div>
+    <div class="stat-card"><i class="bi bi-building"></i><strong>{{ organizations_count }}</strong><span>организаций</span></div>
+    <div class="stat-card"><i class="bi bi-award"></i><strong>{{ grants_count }}</strong><span>грантов</span></div>
+    <div class="stat-card"><i class="bi bi-inbox"></i><strong>{{ applications_count }}</strong><span>заявок</span></div>
+    <div class="stat-card"><i class="bi bi-hourglass-split"></i><strong>{{ review_count }}</strong><span>на рассмотрении</span></div>
+    <div class="stat-card"><i class="bi bi-check-circle"></i><strong>{{ approved_count }}</strong><span>одобрено</span></div>
+    <div class="stat-card"><i class="bi bi-x-circle"></i><strong>{{ rejected_count }}</strong><span>отклонено</span></div>
+    <div class="stat-card"><i class="bi bi-alarm"></i><strong>{{ soon_deadlines_count }}</strong><span>дедлайнов скоро</span></div>
+  </div>
+
+  <div class="dashboard-grid mb-4">
+    <a class="dash-action" href="{% url 'grant_create' %}"><i class="bi bi-plus-circle"></i><span>Добавить грант</span></a>
+    <a class="dash-action" href="{% url 'manage_applications' %}"><i class="bi bi-inbox"></i><span>Управление заявками</span></a>
+    <a class="dash-action" href="{% url 'export_excel' %}"><i class="bi bi-file-earmark-excel"></i><span>Excel-отчет</span></a>
+    {% if user.role == 'admin' or user.is_staff %}
+      <a class="dash-action" href="{% url 'users_list' %}"><i class="bi bi-people"></i><span>Пользователи</span></a>
+      <a class="dash-action" href="{% url 'manage_categories' %}"><i class="bi bi-tags"></i><span>Категории</span></a>
+    {% endif %}
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-5">
+      <div class="content-panel">
+        <div class="section-head"><h2>Фильтр заявок</h2><a href="{% url 'dashboard' %}">Сбросить</a></div>
+        <form method="get" class="management-filter">
+          <select class="form-select" name="status">
+            <option value="">Все статусы</option>
+            {% for value,label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+          <select class="form-select" name="grant">
+            <option value="">Все гранты</option>
+            {% for grant in all_grants %}<option value="{{ grant.id }}" {% if selected_grant == grant.id|stringformat:'s' %}selected{% endif %}>{{ grant.title }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-primary"><i class="bi bi-funnel"></i> Применить</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="content-panel">
+        <div class="section-head"><h2>Популярные программы</h2><span class="text-secondary small">по количеству заявок</span></div>
+        {% for grant in popular_grants %}
+          <a class="mini-row" href="{% url 'grant_detail' grant.pk %}">
+            <span>{{ grant.title }}<br><small>{{ grant.country }} · {{ grant.category.name }}</small></span>
+            <strong>{{ grant.applications_total }}</strong>
+          </a>
+        {% empty %}<p class="text-secondary">Данных пока нет.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="content-panel">
+        <div class="section-head"><h2>Категории</h2></div>
+        {% for item in category_stats %}
+          <div class="metric-row"><span>{{ item.category__name }}</span><strong>{{ item.total }}</strong></div>
+        {% empty %}<p class="text-secondary">Категорий пока нет.</p>{% endfor %}
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="content-panel">
+        <div class="section-head"><h2>Страны</h2></div>
+        {% for item in country_stats %}
+          <div class="metric-row"><span>{{ item.country }}</span><strong>{{ item.total }}</strong></div>
+        {% empty %}<p class="text-secondary">Стран пока нет.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="content-panel">
+        <div class="section-head"><h2>Грантовые программы</h2><a href="{% url 'grant_create' %}">Новая</a></div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle admin-table">
+            <thead><tr><th>Название</th><th>Заявки</th><th>Дедлайн</th><th></th></tr></thead>
+            <tbody>
+              {% for grant in grants %}
+                <tr>
+                  <td><a href="{% url 'grant_detail' grant.pk %}">{{ grant.title }}</a><br><small>{{ grant.organization }} · {{ grant.country }}</small></td>
+                  <td><strong>{{ grant.applications_total }}</strong></td>
+                  <td><span class="deadline-pill {% if grant.is_deadline_soon %}urgent{% endif %}">{{ grant.deadline|date:"d.m.Y" }}</span></td>
+                  <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'grant_update' grant.pk %}"><i class="bi bi-pencil"></i></a>
+                    {% if user.role == 'admin' or user.is_staff %}
+                      <form class="d-inline" method="post" action="{% url 'grant_delete' grant.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" data-confirm="Удалить грант?"><i class="bi bi-trash"></i></button></form>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}<tr><td colspan="4" class="text-secondary">Грантов пока нет.</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="content-panel">
+        <div class="section-head"><h2>Последние заявки</h2><a href="{% url 'manage_applications' %}">Все</a></div>
+        {% for app in applications %}
+          <div class="mini-row"><span>{{ app.user.full_name }}<br><small>{{ app.grant.title }}</small></span><strong class="status">{{ app.get_status_display }}</strong></div>
+        {% empty %}<p class="text-secondary">Заявок пока нет.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

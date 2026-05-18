@@ -1,0 +1,62 @@
+{% extends 'portal/base.html' %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="profile-hero">
+    <div class="profile-avatar"><i class="bi bi-person-circle"></i></div>
+    <div>
+      <span class="section-kicker">Личный кабинет</span>
+      <h1>{{ user.full_name }}</h1>
+      <p>{{ user.university|default:"Университет не указан" }} · {{ user.faculty|default:"Факультет не указан" }} · {{ user.course|default:"-" }} курс</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><i class="bi bi-send"></i><strong>{{ applications_count }}</strong><span>заявок</span></div>
+    <div class="stat-card"><i class="bi bi-bookmark"></i><strong>{{ saved_count }}</strong><span>сохранено</span></div>
+    <div class="stat-card"><i class="bi bi-stars"></i><strong>{{ recommendations_count }}</strong><span>подходит</span></div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-lg-5">
+      <div class="content-panel">
+        <div class="section-head"><h2>Профиль студента</h2></div>
+        <form method="post" class="vstack gap-3">{% csrf_token %}
+          {% for field in form %}<label>{{ field.label }}{{ field }}</label>{% endfor %}
+          <button class="btn btn-primary">Сохранить изменения</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="content-panel">
+            <div class="section-head"><h2>Рекомендации</h2><a href="{% url 'recommendations' %}">Все</a></div>
+            {% for grant in recommendations %}
+              <a class="mini-row" href="{% url 'grant_detail' grant.pk %}"><span>{{ grant.title }}</span><small>{{ grant.deadline|date:"d.m.Y" }}</small></a>
+            {% empty %}<p class="text-secondary">Заполните интересы и уровень образования для точных рекомендаций.</p>{% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="content-panel">
+            <div class="section-head"><h2>Мои заявки</h2><a href="{% url 'my_applications' %}">Открыть</a></div>
+            {% for app in applications %}<div class="mini-row"><span>{{ app.grant.title }}</span><small class="status">{{ app.get_status_display }}</small></div>{% empty %}<p class="text-secondary">Заявок пока нет.</p>{% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="content-panel">
+            <div class="section-head"><h2>Сохраненные</h2><a href="{% url 'saved_grants' %}">Открыть</a></div>
+            {% for item in saved_grants %}<a class="mini-row" href="{% url 'grant_detail' item.grant.pk %}"><span>{{ item.grant.title }}</span></a>{% empty %}<p class="text-secondary">Список пуст.</p>{% endfor %}
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="content-panel">
+            <div class="section-head"><h2>Уведомления</h2><a href="{% url 'notifications' %}">Все</a></div>
+            {% for note in notifications %}<div class="mini-row"><span>{{ note.message }}</span><small>{{ note.created_at|date:"d.m" }}</small></div>{% empty %}<p class="text-secondary">Новых уведомлений нет.</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

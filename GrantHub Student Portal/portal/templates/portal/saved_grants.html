@@ -1,0 +1,14 @@
+{% extends 'portal/base.html' %}
+{% block title %}Сохраненные гранты{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="catalog-hero">
+    <span class="section-kicker">Избранное</span>
+    <h1>Сохраненные гранты</h1>
+    <p>Программы, к которым удобно вернуться позже.</p>
+  </div>
+  <div class="row g-4">
+    {% for item in items %}<div class="col-md-6 col-xl-4">{% with grant=item.grant %}{% include 'portal/grant_card.html' %}{% endwith %}</div>{% empty %}<div class="empty-state">Сохраненных грантов пока нет.</div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

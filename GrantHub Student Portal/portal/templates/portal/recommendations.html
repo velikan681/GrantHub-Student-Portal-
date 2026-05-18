@@ -1,0 +1,14 @@
+{% extends 'portal/base.html' %}
+{% block title %}Рекомендации{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="catalog-hero">
+    <span class="section-kicker">Персональная подборка</span>
+    <h1>Рекомендации</h1>
+    <p>Подборка на основе направления обучения, уровня образования и интересов.</p>
+  </div>
+  <div class="row g-4">
+    {% for grant in grants %}<div class="col-md-6 col-xl-4">{% include 'portal/grant_card.html' %}</div>{% empty %}<div class="empty-state">Пока нет подходящих предложений.</div>{% endfor %}
+  </div>
+</div>
+{% endblock %}
